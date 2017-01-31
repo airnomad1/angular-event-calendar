@@ -1,0 +1,79 @@
+
+.has-events {
+    background: green;
+}
+
+.has-pending {
+    background: yellow !important;
+}
+
+.event-view-container {
+    float: left;
+    width: 650px;
+}
+
+.header {
+    float: left;
+    width: 100%;
+    height: 50px;
+}
+
+.body {
+    float: left;
+    width: 100%;
+    background: #ccc;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.time-container ul li {
+    background: red;
+    border-bottom: 1px solid #000;
+}
+
+.time-container {
+    width: 25%;
+    float: left;
+}
+
+.time-container h4 {
+    margin: 0;
+}
+
+.grid-container {
+    width: 75%;
+    float: left;
+}
+
+.grid-container ul li {
+    width: 80px;
+    height: 1175px;
+    float: left;
+}
+
+.track{
+    float: left;
+    width: 100%;
+}
+
+.line-wrapper{
+    width: 100%;
+    height: 25px;
+    background: cyan;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.line{
+    display: inline-block;
+    width: 2px;
+    height: 100%;
+}
+
+.highlight{
+    background: red!important;
+}
