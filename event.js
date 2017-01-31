@@ -29,43 +29,91 @@
 
     var app = angular.module('app');
 
-    app.directive('event', ['$compile', function ($compile) {
+    app.directive('calendar', ['$compile', function ($compile) {
         return {
             restrict: 'E',
-            scope: {},
+            scope: {
+                events: '='
+            },
             templateUrl: 'calendar.html',
             link: function (scope, elem, attr) {
-                scope.calendar = generateCalendar(0);
-
-                elem.html(scope.calendar.html);
-                $compile(elem.contents())(scope);
-
+                var date = new Date();
+                scope.calendar = generateCalendar(date.getMonth(), date.getFullYear());
+                renderCalendar(elem, scope.calendar.html);
 
                 scope.prevMonth = function () {
-                    scope.calendar = generateCalendar(scope.calendar.meta.currMonth - 1);
-                    elem.html(scope.calendar.html);
-                    $compile(elem.contents())(scope);
+                    var currMonth = scope.calendar.meta.currMonth;
+
+                    if (currMonth == 0) {
+                        scope.calendar = generateCalendar(11, scope.calendar.meta.year - 1);
+                        renderCalendar(elem, scope.calendar.html);
+                    } else {
+                        scope.calendar = generateCalendar(scope.calendar.meta.currMonth - 1, scope.calendar.meta.year);
+                        renderCalendar(elem, scope.calendar.html);
+                    }
                 };
 
                 scope.nextMonth = function () {
-                    scope.calendar = generateCalendar(scope.calendar.meta.currMonth + 1);
-                    elem.html(scope.calendar.html);
-                    $compile(elem.contents())(scope);
+                    var currMonth = scope.calendar.meta.currMonth;
+
+                    if (currMonth == 11) {
+                        scope.calendar = generateCalendar(0, scope.calendar.meta.year + 1);
+                        renderCalendar(elem, scope.calendar.html);
+                    } else {
+                        scope.calendar = generateCalendar(scope.calendar.meta.currMonth + 1, scope.calendar.meta.year);
+                        renderCalendar(elem, scope.calendar.html);
+                    }
                 };
+
+                /**
+                 * get event in given date
+                 * @param date
+                 * **/
+                function getEvents(date) {
+                    var oEvents = {events: [], hasEvents: false, hasPending: false};
+
+                    for (var i = 0; i < scope.events.length; i++) {
+                        var oDate = new Date(scope.events[i].start).toDateString();
+
+                        if (oDate == date) {
+                            oEvents.events.push(scope.events[i]);
+                            oEvents.hasEvents = true;
+
+                            if (scope.events[i].pending) {
+                                oEvents.hasPending = true;
+                            }
+                        }
+                    }
+
+                    return oEvents;
+                }
+
+                /**
+                 * render calendar to element
+                 * @param elem - target element
+                 * @param oCalendar - calendar object that contains html
+                 * **/
+                function renderCalendar(elem, oCalendar) {
+                    elem.html(oCalendar);
+                    $compile(elem.contents())(scope);
+                }
 
                 /**
                  * generate calendar
                  * @param monthIndex - index of month as in javascript Date object
                  * **/
+                function generateCalendar(monthIndex, year) {
+                    console.log(scope.events);
 
-                function generateCalendar(monthIndex) {
                     var oDate = new Date();
 
                     var oMeta = {
-                        date: new Date(),
+                        date: oDate,
+                        thisMonth: oDate.getMonth(),
                         currMonth: monthIndex,
                         day: oDate.getDate(),
-                        year: oDate.getFullYear()
+                        year: year,
+                        calendar: []
                     };
 
                     var firstDateOfMonth = new Date(monthIndex + 1 + '-1-' + oMeta.year);
@@ -85,10 +133,29 @@
                             padding += "</tr><tr>";
                         }
 
-                        if (i == oMeta.day && monthIndex == oMeta.currMonth) {
-                            padding += "<td class='currentday'  onMouseOver='this.style.background=\"#00FF00\"; this.style.color=\"#FFFFFF\"' onMouseOut='this.style.background=\"#FFFFFF\"; this.style.color=\"#00FF00\"'>" + i + "</td>";
+                        var thisDate = new Date(monthIndex + 1 + '-' + i + '-' + oMeta.year);
+
+                        var dateObj = {date: thisDate.toISOString()};
+                        var eventsInThisDate = getEvents(thisDate.toDateString());
+
+                        dateObj = Object.assign(dateObj, eventsInThisDate);
+
+                        var classHasEvents = '';
+                        var classHasPendingEvents = '';
+
+                        if (dateObj.hasEvents) {
+                            classHasEvents = 'has-events';
+                        }
+                        if (dateObj.hasPending) {
+                            classHasPendingEvents = 'has-pending';
+                        }
+
+                        oMeta.calendar.push(dateObj);
+
+                        if (i == oMeta.day && monthIndex == oMeta.thisMonth) {
+                            padding += "<td class='currentmonth currentday " + classHasEvents + " " + classHasPendingEvents + "'>" + i + "</td>";
                         } else {
-                            padding += "<td class='currentmonth' onMouseOver='this.style.background=\"#00FF00\"' onMouseOut='this.style.background=\"#FFFFFF\"'>" + i + "</td>";
+                            padding += "<td class='currentmonth " + classHasEvents + " " + classHasPendingEvents + "'>" + i + "</td>";
                         }
 
                         firstWeekDay++;
@@ -105,6 +172,9 @@
                     ctable += "<tr>";
                     ctable += padding;
                     ctable += "</tr></table>";
+
+                    console.log(oMeta);
+
                     return {meta: oMeta, html: ctable};
                 }
             }
