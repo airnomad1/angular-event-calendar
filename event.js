@@ -83,8 +83,8 @@
                  * @param oDay - day object that contains events array
                  * **/
                 function generateEventsView(oCalendar) {
-                    /*var oDate = new Date(oDay.date);
-                     var monthName = oDate.getMonthName(oDate.getMonth());*/
+                    var oDate = new Date(oCalendar.meta.date);
+                     var monthName = oDate.getMonthName(oDate.getMonth());
 
                     console.log(oCalendar);
 
@@ -102,25 +102,34 @@
                     var view = "<div class='event-view-container'>";
                     /** <header> **/
                     view += "<div class='header'>";
-                    view += "<h3><button><<</button><button>>></button></h3>";
+                    view += "<h3><button class='prev-button'></button>"+monthName+" "+oCalendar.meta.year+"<button class='next-button'></button></h3>";
                     view += "</div>";
                     /** </header> **/
 
                     /** <body> **/
-                    view += "<div class='body'>";
-
+                    view += "<div class='body clearfix'>";
+                    view += "<button class='prev-button header-prev'></button><button class='next-button header-next'></button>"
                     view += "<div class='time-container'>";
-                    view += "<h4>TIME</h4>";
+                    view += "<h5>TIME</h5>";
                     view += rangeHtml;
                     view += "</div>";
 
                     view += "<div class='grid-container'>";
+                    view += "<div class='grid-container-wrapper'>";
                     view += weeksHtml;
+                    view += "</div>";
                     view += "</div>";
 
                     view += "</div>";
 
                     /** </body> **/
+                    /** <footer> **/
+                    view += "<div class='footer'>";
+                    view += "<p class='inline-bl mar-rt-25'><span class='color-sq green-sq'></span>Booked</p>";
+                    view += "<p class='inline-bl'><span class='color-sq yellow-sq'></span>Pending</p>";
+                    view += "<p class='inline-bl flt-right'><a href='#'>Check your calender</a></p>";
+                    view += "</div>";
+                    /** </footer> **/
 
                     view += "</div>";
                     /** </container> **/
@@ -140,7 +149,7 @@
 
                         var slots = '';
 
-                        for (var x = 1; x < 46; x++) {
+                        for (var x = 1; x < 48; x++) {
                             var inEventClass = '';
 
                             if(oMonth[i].hasEvents){
@@ -285,9 +294,9 @@
                         oMeta.calendar.push(dateObj);
 
                         if (i == oMeta.day && monthIndex == oMeta.thisMonth) {
-                            padding += "<td data-index='" + i + "' ng-click='goToEvents(" + actualIndex + ")' class='currentmonth currentday " + classHasEvents + " " + classHasPendingEvents + "'>" + i + "</td>";
+                            padding += "<td data-index='" + i + "' ng-click='goToEvents(" + actualIndex + ")' class='currentmonth currentday " + classHasEvents + " " + classHasPendingEvents + "'><div class='date-container'><p>" + i + "</p></div></td>";
                         } else {
-                            padding += "<td data-index='" + i + "' ng-click='goToEvents(" + actualIndex + ")' class='currentmonth " + classHasEvents + " " + classHasPendingEvents + "'>" + i + "</td>";
+                            padding += "<td data-index='" + i + "' ng-click='goToEvents(" + actualIndex + ")' class='currentmonth " + classHasEvents + " " + classHasPendingEvents + "'><div class='date-container'><p>" + i + "</p></div></td>";
                         }
 
                         firstWeekDay++;
@@ -299,7 +308,7 @@
                         weekDays += '<td>' + oDate.getWeek()[i] + '</td>';
                     }
 
-                    var ctable = "<table class='calendar'><tr class='currentmonth'><th colspan='7'><button ng-click='prevMonth()'><<</button>" + oDate.getMonthName(monthIndex) + " " + oMeta.year + "<button ng-click='nextMonth()'>>></button></th></tr>";
+                    var ctable = "<table class='calendar'><thead><tr class='currentmonth'><th colspan='7'><button ng-click='prevMonth()' class='prevMonth'></button><p class='month-container'>" + oDate.getMonthName(monthIndex) + " " + oMeta.year + "</p><button ng-click='nextMonth()' class='nextMonth'></button></th></tr></thead>";
                     ctable += "<tr class='weekdays'>" + weekDays + "</tr>";
                     ctable += "<tr>";
                     ctable += padding;
